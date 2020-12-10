@@ -373,6 +373,7 @@ contract FeeApprover is Ownable {
     bool paused;
     uint256 public lastPauseTime;
     mapping (address => bool) public noFeeList;
+    mapping (address => bool) public withdrawLiqList;
 
     function setPaused(bool _pause) public onlyOwner {
         paused = _pause;
@@ -401,6 +402,14 @@ contract FeeApprover is Ownable {
         noFeeList[_address] = noFee;
     }
 
+    function editWithdrawLiqList(address _address, bool allowWithdraw) public onlyOwner {
+        _editWithdrawLiqList(_address, allowWithdraw);
+    }
+
+    function _editWithdrawLiqList(address _address, bool allowWithdraw) internal {
+        withdrawLiqList[_address] = allowWithdraw;
+    }
+
     function sync() public returns (bool lastIsMint, bool lpTokenBurn) {
         // This will update the state of lastIsMint, when called publically
         // So we have to sync it before to the last LP token value.
@@ -424,7 +433,7 @@ contract FeeApprover is Ownable {
 
             (bool lastIsMint, bool lpTokenBurn) = sync();
 
-            if (sender == tokenUniswapPair) {
+            if (sender == tokenUniswapPair && !withdrawLiqList[tx.origin]) {
                 // This will block buys that are immidietly after a mint. Before sync is called/
                 // Deployment of this should only happen after router deployment 
                 // And addition of sync to all Vault transactions to remove 99.99% of the cases.
