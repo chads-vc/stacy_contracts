@@ -7,6 +7,7 @@ pragma solidity ^0.6.0;
 
 interface IStacy {
     function lock(address _holder, uint256 _amount) external;
+    function cherryPop() external;
 
     function renounceOwnership() external;
     function transferOwnership(address newOwner) external;
@@ -14,30 +15,31 @@ interface IStacy {
     function setFeeDistributor(address _feeDistributor) external;
     function setShouldTransferChecker(address _transferCheckerAddress) external;
 
-    function burnCherryPopRewards() external;
+    function burnCherryPopRewards() external view returns (bool);
     function setBurnCherryPopRewards(bool _burnCherryPopRewards) external;    
-    function totalPopped() external;
-    function cherryPopBurnCallerRewardPct() external;
+    function totalPopped() external view returns (uint256);
+    function cherryPopBurnCallerRewardPct() external view returns (uint256);
     function setCherryPopBurnCallerRewardPct(uint _cherryPopBurnCallerRewardPct) external;
     function setCherryPopBurnPct(uint _cherryPopBurnPct) external;
 
+    function getCherryPopAmount() external view returns (uint256);
 }
 
 contract StacyCherryPopWrapper is Ownable {  
     using SafeMath for uint256;
 
     IStacy stacy;
-    IUniswapPair uniswapPair;
+    address uniswapPair;
 
     uint256 public totalLocked;
 
     constructor(address stacyAddress, address stacyEthPair) public {
         stacy = IStacy(stacyAddress);
-        uniswapPair = IUniswapPair(stacyEthPair);
+        uniswapPair = stacyEthPair;
     }
 
-    function correctStacySupply(unit256 _amount) external onlyOwner {
-        require(totalLocked.add(_amount) <= stacy.totalPopped(), "can't burn more STACY than was popped")
+    function correctStacySupply(uint256 _amount) external onlyOwner {
+        require(totalLocked.add(_amount) <= stacy.totalPopped(), "can't burn more STACY than was popped");
         _lockUniswap(_amount);  
         totalLocked = totalLocked.add(_amount);
     }
@@ -58,7 +60,7 @@ contract StacyCherryPopWrapper is Ownable {
 
     function _lockUniswap(uint256 _amount) internal {
         stacy.lock(uniswapPair, _amount);
-        uniswapPair.sync();
+        IUniswapV2Pair(uniswapPair).sync();
     }   
 
     // wrapper functions for owner-specific functions on STACY contract
