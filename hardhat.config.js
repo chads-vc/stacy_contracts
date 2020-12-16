@@ -18,6 +18,10 @@ module.exports = {
     rinkeby: {
       url: `https://rinkeby.infura.io/v3/${infura_key}`,
       accounts: [private_key]
+    },
+    mainnet: {
+      url: `https://mainnet.infura.io/v3/${infura_key}`,
+      accounts: [private_key]
     }
   },
   etherscan: {
