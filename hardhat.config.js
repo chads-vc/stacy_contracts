@@ -1,4 +1,4 @@
-const { private_key, etherscan_api, infura_key } = require('./secret.json');
+const { private_key, etherscan_api, infura_key, alchemy_key } = require('./secret.json');
 
 require("@nomiclabs/hardhat-waffle");
 require("@nomiclabs/hardhat-etherscan");
@@ -27,7 +27,7 @@ module.exports = {
     },
     hardhat: {
       forking: {
-        url: "https://eth-mainnet.alchemyapi.io/v2/vg75nfKMIAHkEIyJBxHM9WqgOTvDMyxJ",
+        url: `https://eth-mainnet.alchemyapi.io/v2/${alchemy_key}`,
         blockNumber: 11462848
       }
     }
