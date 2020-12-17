@@ -7,11 +7,13 @@ require("@nomiclabs/hardhat-etherscan");
  * @type import('hardhat/config').HardhatUserConfig
  */
 module.exports = {
-  solidity: "0.6.12",
-  settings: {
-    optimizer: {
-      enabled: true,
-      runs: 200
+  solidity: {
+    version: "0.6.12",
+    settings: {
+      optimizer: {
+        enabled: false,
+        runs: 200
+      }
     }
   },
   networks: {
@@ -22,6 +24,12 @@ module.exports = {
     mainnet: {
       url: `https://mainnet.infura.io/v3/${infura_key}`,
       accounts: [private_key]
+    },
+    hardhat: {
+      forking: {
+        url: "https://eth-mainnet.alchemyapi.io/v2/vg75nfKMIAHkEIyJBxHM9WqgOTvDMyxJ",
+        blockNumber: 11462848
+      }
     }
   },
   etherscan: {

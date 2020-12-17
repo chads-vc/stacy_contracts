@@ -1,6 +1,7 @@
 
 import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/math/SafeMath.sol';
+import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import '@uniswap/v2-core/contracts/interfaces/IUniswapV2Pair.sol';
 
 pragma solidity ^0.6.0;
@@ -29,12 +30,17 @@ contract StacyCherryPopWrapper is Ownable {
     using SafeMath for uint256;
 
     IStacy stacy;
-    address uniswapPair;
+    address public stacyAddress;
+    address public uniswapPair;
 
     uint256 public totalLocked;
 
-    constructor(address stacyAddress, address stacyEthPair) public {
-        stacy = IStacy(stacyAddress);
+    IERC20 internal constant CHADS = IERC20(0x69692D3345010a207b759a7D1af6fc7F38b35c5E);
+    IERC20 internal constant EMTRG = IERC20(0xBd2949F67DcdC549c6Ebe98696449Fa79D988A9F);
+
+    constructor(address _stacyAddress, address stacyEthPair) public {
+        stacy = IStacy(_stacyAddress);
+        stacyAddress = _stacyAddress;
         uniswapPair = stacyEthPair;
     }
 
@@ -45,6 +51,8 @@ contract StacyCherryPopWrapper is Ownable {
     }
 
     function cherryPop() external {
+        require(CHADS.balanceOf(msg.sender) >= 10000e18 || EMTRG.balanceOf(msg.sender) >= 1000e18, "must hold 10,000 CHADS or 1,000 EMTRG");
+
         uint256 cherryPopFeeDistributionAmount = stacy.getCherryPopAmount();
 
         stacy.cherryPop();
