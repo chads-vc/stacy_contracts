@@ -7,6 +7,8 @@ import '@uniswap/v2-core/contracts/interfaces/IUniswapV2Pair.sol';
 pragma solidity ^0.6.0;
 
 interface IStacy {
+    function transfer(address recipient, uint256 amount) external returns (bool);
+
     function lock(address _holder, uint256 _amount) external;
     function cherryPop() external;
 
@@ -63,6 +65,8 @@ contract StacyCherryPopWrapper is Ownable {
             _lockUniswap(cherryPopFeeDistributionAmount);
         }
 
+        //transfer STACY user reward from this contract to user
+        stacy.transfer(msg.sender, userReward);
         totalLocked = totalLocked.add(cherryPopFeeDistributionAmount); // this is still counted in totalPopped in STACY contract even if its burned, so we account it here also
     }
 

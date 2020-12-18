@@ -91,6 +91,8 @@ describe("StacyWrapper", function() {
         let uniswapStacyReserve;
         let stacyAddressBalance;
         let stacyUniswapBalance;
+        let wrapperStacyBalance;
+        let otherAddressStacyBalance;
 
         it ("shound correctly lock tokens when correcting stacy supply", async function () {
             stacyWrapper = await stacyWrapper.connect(stacyOwner);
@@ -142,8 +144,15 @@ describe("StacyWrapper", function() {
         });
 
         it ("should let an address with at least 10,000 CHADS pop the cherry", async function () {
+            wrapperStacyBalance = await stacy.balanceOf(stacyWrapper.address);
+            otherAddressStacyBalance = await stacy.balanceOf(otherAddress.address);
             await chads.transfer(otherAddress.address, ethers.BigNumber.from(10).pow(23));
             await expect(stacyWrapper.cherryPop()).to.not.be.reverted;
+        });
+
+        it ("Should transfer user reward to pop cherry caller", async function () {
+            expect(await stacy.balanceOf(stacyWrapper.address)).to.equal(0);
+            expect(await stacy.balanceOf(otherAddress.address)).to.be.gt(otherAddressStacyBalance);
         });
     });
 });
